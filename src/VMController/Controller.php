@@ -28,13 +28,137 @@ class Controller {
 	 */
 	private $post;
 
+    /**
+     * Заголовки по умолчанию
+     * @var array
+     */
+    protected $headers = [
+        'Cache-Control: no-cache, must-revalidate',
+        'Pragma: no-cache',
+    ];
+
+    /**
+     * @var int
+     *  - статус ответа от сервера
+     */
+    private $statusHTTP = 200;
+
+    /**
+     * Формат вывода данных на экран
+     *
+     * @var string
+     */
+    private $outputDataFormat = 'html';
+
 
 	public function __construct(array $params)
 	{
 		$this->params = $params;
 		$this->get = $_GET;
 		$this->post = $_POST;
+        $this
+            ->setDefaultHeaders()
+            ->setStatusHTTP($this->statusHTTP)
+            ->setDataFormat($this->outputDataFormat);
 	}
+
+    /**
+     * Установка формата ответа
+     *
+     * @param string $dataFormat
+     * @return Controller
+     */
+    public function setDataFormat($dataFormat)
+    {
+        switch($dataFormat)
+        {
+            case 'png':
+                $dataFormat = 'image/png';
+                break;
+            case 'gif':
+                $dataFormat = 'image/gif';
+                break;
+            case 'jpg':
+            case 'jpeg':
+                $dataFormat = 'image/jpeg';
+                break;
+            case 'pdf':
+                $dataFormat = 'application/pdf';
+                break;
+            case 'json':
+                $dataFormat = 'application/json';
+                break;
+            case 'text':
+                $dataFormat = 'text/plain';
+                break;
+            case 'xml':
+                $dataFormat = 'text/xml';
+                break;
+            case 'html':
+            default:
+                $dataFormat = 'text/html';
+                break;
+        }
+        return $this->setHeader("Content-Type: {$dataFormat}; charset=utf-8");
+    }
+
+    /**
+     * Установка заголовков по умолчанию
+     *
+     * @return $this
+     */
+    protected function setDefaultHeaders()
+    {
+        foreach ($this->headers as $header)
+        {
+            $this->setHeader($header);
+        }
+        return $this;
+    }
+
+    /**
+     * @param $url
+     */
+    public function redirect($url)
+    {
+        header("Location: {$url}", true, 301);
+        exit;
+    }
+
+    /**
+     * Получение кода статуса ответа
+     *
+     * @return int
+     */
+    public function getStatusHTTP()
+    {
+        return $this->statusHTTP;
+    }
+
+    /**
+     * Установка статуса ответа от сервера
+     *
+     * @param int $status
+     * @return $this
+     */
+    public function setStatusHTTP($status)
+    {
+        $this->statusHTTP = $status;
+        http_response_code($this->statusHTTP);
+        return $this;
+    }
+
+    /**
+     * Установка Http заголовков
+     *
+     * @param $header
+     * @return $this
+     */
+    public function setHeader($header)
+    {
+        header($header);
+        return $this;
+    }
 
 	/**
 	 * Отправляет пользователю cookie
