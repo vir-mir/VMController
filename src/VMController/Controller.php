@@ -28,6 +28,11 @@ class Controller {
 	 */
 	private $post;
 
+	/**
+	 * @var array
+	 */
+	private $cookie;
+
     /**
      * Заголовки по умолчанию
      * @var array
@@ -56,6 +61,7 @@ class Controller {
 		$this->params = $params;
 		$this->get = $_GET;
 		$this->post = $_POST;
+		$this->cookie = $_COOKIE;
         $this
             ->setDefaultHeaders()
             ->setStatusHTTP($this->statusHTTP)
@@ -228,6 +234,19 @@ class Controller {
 	public function getCollectionPost($key, $default = null)
 	{
 		return array_key_exists($key, $this->post) ? $this->post[$key] : $default;
+	}
+
+	/**
+	 * Получение параметров из $_COOKIE
+	 *
+	 * @param $key
+	 * @param null $default
+	 *
+	 * @return null
+	 */
+	public function getCollectionCookie($key, $default = null)
+	{
+		return array_key_exists($key, $this->cookie) ? $this->cookie[$key] : $default;
 	}
 
 	/**
